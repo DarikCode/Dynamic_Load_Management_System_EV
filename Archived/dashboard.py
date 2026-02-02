@@ -28,8 +28,8 @@ st.markdown("""
 @st.cache_resource
 def load_assets():
     try:
-        model = joblib.load('real_data_model.pkl')
-        df = pd.read_csv('processed_load_profile.csv', parse_dates=[0], index_col=0)
+        model = joblib.load('../real_data_model.pkl')
+        df = pd.read_csv('../processed_load_profile.csv', parse_dates=[0], index_col=0)
         return model, df
     except FileNotFoundError:
         return None, None
@@ -44,6 +44,7 @@ if model is None:
 # --- 3. DIGITAL TWIN STATE ---
 if 'sim_time' not in st.session_state:
     st.session_state.sim_time = df_history.index.max() - timedelta(days=2)
+    # This variable tracks if the simulation is currently active
     st.session_state.is_running = False
     st.session_state.total_cost = 0.0
     st.session_state.solar_generated = 0.0
@@ -142,7 +143,7 @@ def get_battery_physics_rate(current_soc, max_rate):
         return max_rate * max(0.1, factor)  # Minimum 10% trickle charge
 
 
-# --- 5. SMART DLM ALGORITHM (FIXED) ---
+# --- 5. SMART DLM ALGORITHM  ---
 def smart_dlm_optimizer(grid_limit, solar_kw, price, vehicles, price_threshold=0.20):
     """
     Optimizes for: 1. Grid Safety, 2. Vehicle Priority, 3. Cost Saving
@@ -209,6 +210,22 @@ def get_ai_prediction(ts):
 # --- 7. SIDEBAR CONTROLS ---
 st.sidebar.title("🎛️ Control Room")
 
+# --- Simulation Playback Control (Top Priority) ---
+st.sidebar.markdown("### ⏯️ Simulation Control")
+
+# The Run/Pause Button
+# We use a distinct style for the button depending on state
+if st.session_state.is_running:
+    if st.sidebar.button("⏸️ Pause Simulation", type="primary", use_container_width=True):
+        st.session_state.is_running = False
+        st.rerun()
+else:
+    if st.sidebar.button("▶️ Run Simulation", type="primary", use_container_width=True):
+        st.session_state.is_running = True
+        st.rerun()
+
+st.sidebar.markdown("---")
+
 with st.sidebar.expander("1. Infrastructure Setup", expanded=True):
     GRID_CAPACITY = st.slider("Grid Connection Limit (kW)", 50, 300, 150)
     SOLAR_SIZE = st.slider("Solar Array Size (kW)", 0, 100, 40)
@@ -217,10 +234,25 @@ with st.sidebar.expander("2. Smart Policies", expanded=True):
     PRICE_SENSITIVITY = st.slider("Max Price Threshold ($/kWh)", 0.05, 0.50, 0.20, 0.01)
     st.caption("Regular charging throttled above this price.")
 
-with st.sidebar.expander("3. Simulation", expanded=True):
-    sim_mode = st.radio("Simulation Mode", ["Manual Step", "Auto-Play (Fast)"])
-    if st.button("⏩ Jump 1 Hour"):
-        st.session_state.sim_time += timedelta(hours=1)
+with st.sidebar.expander("3. Manual Controls", expanded=True):
+    # Only show manual time controls if simulation is PAUSED
+    if not st.session_state.is_running:
+        st.markdown("##### 🛠️ Set Time")
+        col_d, col_t = st.columns(2)
+        with col_d:
+            new_date = st.date_input("Date", value=st.session_state.sim_time.date())
+        with col_t:
+            new_time = st.time_input("Time", value=st.session_state.sim_time.time())
+
+        if st.button("Update Time"):
+            st.session_state.sim_time = datetime.combine(new_date, new_time)
+            st.success(f"Time set to {new_time}")
+
+        if st.button("⏩ Jump 1 Hour"):
+            st.session_state.sim_time += timedelta(hours=1)
+            st.rerun()
+    else:
+        st.info("⚠️ Pause simulation to manually change time.")
 
 # --- 8. MAIN DASHBOARD ---
 

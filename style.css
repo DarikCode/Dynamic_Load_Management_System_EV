@@ -1,0 +1,181 @@
+/* style.css */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap');
+
+:root {
+    /* 🎨 Modern Color Palette */
+    --bg-dark: #0e1117;
+    --bg-card: rgba(255, 255, 255, 0.05);
+    --bg-card-border: rgba(255, 255, 255, 0.1);
+    --text-primary: #e0e0e0;
+    --text-secondary: #a0a0a0;
+    --accent-primary: #00d4ff; /* Neon Cyan */
+    --accent-glow: rgba(0, 212, 255, 0.3);
+    --success: #00ff9d;
+    --warning: #ffcc00;
+    --danger: #ff4b4b;
+}
+
+/* 1. Main Container & Background */
+.stApp {
+    background-color: var(--bg-dark);
+    color: var(--text-primary);
+    font-family: 'Inter', sans-serif;
+    /* Subtle radial gradient for a "spotlight" effect */
+    background-image: radial-gradient(circle at 50% 0%, #1c2331 0%, #0e1117 100%);
+}
+
+/* 2. Glassmorphism Cards (Metrics & Containers) */
+[data-testid="stMetric"],
+[data-testid="stDataFrame"] {
+    background: var(--bg-card);
+    backdrop-filter: blur(10px); /* The "Glass" effect */
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid var(--bg-card-border);
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+[data-testid="stMetric"]:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+    border-color: var(--accent-primary);
+}
+
+/* Metric Label Styling */
+[data-testid="stMetricLabel"] {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+[data-testid="stMetricValue"] {
+    color: var(--text-primary);
+    font-family: 'JetBrains Mono', monospace; /* Tech feel for numbers */
+    font-weight: 600;
+}
+
+/* 3. Sidebar Styling */
+[data-testid="stSidebar"] {
+    background-color: #161b22;
+    border-right: 1px solid var(--bg-card-border);
+}
+
+[data-testid="stSidebar"] h1,
+[data-testid="stSidebar"] h2,
+[data-testid="stSidebar"] h3 {
+    color: var(--text-primary);
+}
+
+/* 4. Modern Buttons */
+.stButton > button {
+    background: linear-gradient(135deg, #00d4ff 0%, #0056b3 100%);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 0.6rem 1rem;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(0, 212, 255, 0.2);
+}
+
+.stButton > button:hover {
+    box-shadow: 0 6px 20px rgba(0, 212, 255, 0.4);
+    transform: scale(1.02);
+}
+
+.stButton > button:active {
+    transform: scale(0.98);
+}
+
+/* Secondary/Ghost Buttons (if any) */
+button[kind="secondary"] {
+    background: transparent;
+    border: 1px solid var(--accent-primary);
+    color: var(--accent-primary);
+}
+
+/* 5. Typography & Headers */
+h1, h2, h3 {
+    color: white;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+}
+
+h1 {
+    background: -webkit-linear-gradient(0deg, #fff, #a0a0a0);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+/* 6. Custom Status Badges (Tech Pills) */
+.status-badge {
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    border: 1px solid transparent;
+}
+
+.status-charging {
+    background: rgba(0, 212, 255, 0.1);
+    color: var(--accent-primary);
+    border-color: rgba(0, 212, 255, 0.3);
+    box-shadow: 0 0 10px rgba(0, 212, 255, 0.1);
+}
+
+.status-waiting {
+    background: rgba(255, 204, 0, 0.1);
+    color: var(--warning);
+    border-color: rgba(255, 204, 0, 0.3);
+}
+
+.status-done {
+    background: rgba(0, 255, 157, 0.1);
+    color: var(--success);
+    border-color: rgba(0, 255, 157, 0.3);
+}
+
+.status-throttled {
+    background: rgba(255, 75, 75, 0.1);
+    color: var(--danger);
+    border-color: rgba(255, 75, 75, 0.3);
+}
+
+/* 7. Inputs & Sliders */
+.stSlider [data-baseweb="slider"] {
+    /* Custom slider styling usually requires deep CSS hacking in Streamlit,
+       but we can adjust colors via theme config or simple overrides */
+}
+
+/* 8. Dataframes/Tables */
+[data-testid="stDataFrame"] {
+    background: transparent;
+    border: 1px solid var(--bg-card-border);
+}
+
+/* Force dark text to white in tables if it defaults to black */
+[data-testid="stDataFrame"] div {
+    color: var(--text-primary);
+}
+
+/* 9. Scrollbar (Chrome/Safari) */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+::-webkit-scrollbar-track {
+    background: #0e1117;
+}
+::-webkit-scrollbar-thumb {
+    background: #2d3748;
+    border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: #4a5568;
+}
